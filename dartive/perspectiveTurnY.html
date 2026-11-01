@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the perspectiveTurnY function from the dartive library, for the Dart programming language.">
+  <title>perspectiveTurnY function - dartive library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">dartive</a></li>
+    <li><a href="../dartive/">dartive.dart</a></li>
+    <li class="self-crumb">perspectiveTurnY function</li>
+  </ol>
+  <div class="self-name">perspectiveTurnY</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+  <div
+      id="dartdoc-main-content"
+      class="main-content"
+      data-above-sidebar="dartive&#47;dartive-library-sidebar.html"
+      data-below-sidebar="">
+      <div>
+<h1><span class="kind-function">perspectiveTurnY</span> function 
+ 
+    <span class="category projection cp-1 linked" title="This is part of the Projection topic."><a href="../topics/Projection-topic.html">Projection</a></span>
+</h1></div>
+
+    <section class="multi-line-signature">
+        
+<span class="returntype"><a href="https://pub.dev/documentation/vector_math/2.2.0/vector_math_64/Matrix4-class.html">Matrix4</a></span>
+<span class="name ">perspectiveTurnY</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="perspectiveTurnY-param-angleRadians"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">angleRadians</span>, {</span></li>
+<li><span class="parameter" id="perspectiveTurnY-param-depth"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">depth</span> = <span class="default-value">0.001</span>, </span></li>
+</ol>})
+
+        
+
+    </section>
+    
+<section class="desc markdown">
+  <p>A perspective "card flip" matrix that fakes a <code>rotateY</code> head/body turn
+for a flat 2D puppet with no real mesh — <code>setEntry(3, 2, depth)</code> adds
+the projective divide a plain <code>rotateY</code> lacks, so the far side visually
+compresses instead of just shearing. Apply around the part's own local
+origin (translate first, then <code>canvas.transform(matrix.storage)</code>).</p>
+<p><code>rotateY</code> turns around the <em>vertical</em> axis — like a door hinged top-to-
+bottom — so the visible motion is left/right. See <a href="../dartive/perspectiveTurnX.html">perspectiveTurnX</a>
+for the up/down sibling, and <code>products/squishy-mascot-twin/README.md</code>'s
+background section for the hinge/globe intuition behind why that's not
+backwards.</p>
+<p>First extracted from <code>products/squishy-mascot-twin</code>'s
+<code>mascot_painter.dart</code>, where <code>depth</code> was tuned to <code>0.001</code>.</p>
+<p>Math (PRJ-6): M = P·R_y(θ), a 4×4 homogeneous matrix where P is the
+identity with entry (3,2) = depth, so w' = 1 + depth·z and the far
+half shrinks by 1/w'. Not affine (the last row is not (0,0,0,1)).</p>
+</section>
+
+
+    
+
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">dartive</a></li>
+    <li><a href="../dartive/">dartive</a></li>
+    <li class="self-crumb">perspectiveTurnY function</li>
+</ol>
+
+    <h5>dartive library</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-left-->
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    dartive
+      0.0.1
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

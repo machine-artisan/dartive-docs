@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="Voxels topic docs, for the Dart programming language.">
+  <title>Voxels topic - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">dartive</a></li>
+    <li class="self-crumb">Voxels topic</li>
+  </ol>
+  <div class="self-name">Voxels</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div id="dartdoc-main-content" class="main-content">
+  <h1><span class="kind-category">Voxels</span> topic</h1>
+  
+<section class="desc markdown">
+  <h1 id="voxels-vox">Voxels (VOX)</h1>
+<p><code>VoxelPuppet</code>, <code>VoxelPuppetPainter</code>, <code>VoxelPuppetIo</code>. Notation:
+<code>linear-algebra.md</code>; camera: <code>projection.md</code>.</p>
+<h2 id="model">Model</h2>
+<pre class="language-dart"><code>V : [0, size)³ ⊂ ℤ³ ⇀ Color            a partial function, stored sparsely
+center(x,y,z) = (x,y,z) − (size/2 − ½)·(1,1,1)     the unit cube's world center
+faces: 6 outward normals n ∈ {±e_x, ±e_y, ±e_z}
+</code></pre>
+<h2 id="rendering-pipeline-one-paint">Rendering pipeline (one paint)</h2>
+<pre class="language-dart"><code>1. hidden-face cull   skip a face whose neighbor at cell + n is defined
+2. back-face cull     skip a face with n·forward ≥ 0   (it faces away)
+3. depth              depth(face) = mean over corners of (corner·forward)
+4. sort               draw in descending depth (far → near, painter's algorithm)
+5. shade              n_y &gt; ½ → as-is · n_y &lt; −½ → 45% toward black · sides → 22%
+</code></pre>
+<h2 id="invariants">Invariants</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Statement</th>
+<th>Status</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VOX-1</td>
+<td><code>at</code> returns V or <code>null</code>; <code>set</code>/<code>toggle</code> outside <code>[0,size)³</code> do nothing; every change notifies</td>
+<td>✅</td>
+<td><code>voxel_puppet_test</code></td>
+</tr>
+<tr>
+<td>VOX-2</td>
+<td>Hidden-face culling uses the <strong>whole</strong> puppet even when <code>includeVoxel</code> restricts what gets drawn</td>
+<td>✅</td>
+<td><code>voxel_puppet_painter_test</code></td>
+</tr>
+<tr>
+<td>VOX-3</td>
+<td>Steps 2–4 above. Mean-depth sorting is exact for culled, axis-aligned unit faces under an orthographic camera at the default elevation. Arbitrary geometry isn't covered</td>
+<td>📄</td>
+<td>—</td>
+</tr>
+<tr>
+<td>VOX-4</td>
+<td><code>voxelPuppetFromJson(p.toJson())</code> reproduces <code>size</code> and V exactly</td>
+<td>✅</td>
+<td><code>voxel_puppet_io_test</code></td>
+</tr>
+</tbody>
+</table>
+<p>Note: the shading in step 5 is a fixed 3-tone look, not lighting. A
+Lambert term <code>max(0, n·l)</code> would be a new, proposed primitive (<code>VOX-P1</code>),
+not a bug fix.</p>
+</section>
+
+
+
+  <section class="summary offset-anchor" id="classes">
+    <h2>Classes</h2>
+    <dl>
+      <dt id="VoxelPuppet">
+  <span class="name "><a href="../dartive/VoxelPuppet-class.html">VoxelPuppet</a></span> 
+    <span class="category voxels cp-3 linked" title="This is part of the Voxels topic."><a href="../topics/Voxels-topic.html">Voxels</a></span>
+
+</dt>
+<dd>
+  A sparse grid of colored unit cubes — a puppet built out of voxels
+instead of bones/parts. State only: knows nothing about how it gets
+drawn (see <a href="../dartive/VoxelPuppetPainter-class.html">VoxelPuppetPainter</a> in <code>voxel_puppet_painter.dart</code>) — same
+state/render split as every other product in this factory. Coordinates
+are grid-cell indices (0..size-1 per axis), not world units.
+</dd>
+
+      <dt id="VoxelPuppetPainter">
+  <span class="name "><a href="../dartive/VoxelPuppetPainter-class.html">VoxelPuppetPainter</a></span> 
+    <span class="category voxels cp-3 linked" title="This is part of the Voxels topic."><a href="../topics/Voxels-topic.html">Voxels</a></span>
+
+</dt>
+<dd>
+  Renders a <a href="../dartive/VoxelPuppet-class.html">VoxelPuppet</a> as flat-shaded, depth-sorted unit cubes under a
+given <a href="../dartive/VoxelPuppetPainter/camera.html">camera</a> — backface-culled, and faces fully hidden by a
+neighboring voxel are skipped before that, so this stays cheap even at
+a puppet's full grid size. <code>camera</code> is a constructor parameter, not a
+fixed field, so the same puppet can be painted from several angles at
+once (see <code>products/voxel-asset-bakery</code>'s multi-view panel for a
+consumer that does exactly that).
+</dd>
+
+    </dl>
+  </section>
+
+
+  <section class="summary offset-anchor" id="extensions">
+    <h2>Extensions</h2>
+    <dl>
+      <dt id="VoxelPuppetIo">
+  <span class="name "><a href="../dartive/VoxelPuppetIo.html">VoxelPuppetIo</a></span>
+  on <a href="../dartive/VoxelPuppet-class.html">VoxelPuppet</a>
+  
+    <span class="category voxels cp-3 linked" title="This is part of the Voxels topic."><a href="../topics/Voxels-topic.html">Voxels</a></span>
+
+</dt>
+<dd>
+  Serialization for <a href="../dartive/VoxelPuppet-class.html">VoxelPuppet</a> — plain JSON (grid size + a flat list
+of <code>{x,y,z,color}</code> cells), not a Dart-source literal or a binary
+format: any consuming product can parse this with nothing but
+<code>dart:convert</code>, no extra dependency beyond <code>dartive</code> itself.
+</dd>
+
+    </dl>
+  </section>
+
+
+
+  <section class="summary offset-anchor" id="functions">
+    <h2>Functions</h2>
+    <dl class="callables">
+      <dt id="voxelPuppetFromJson" class="callable">
+  <span class="name"><a href="../dartive/voxelPuppetFromJson.html">voxelPuppetFromJson</a></span><span class="signature">(<wbr><span class="parameter" id="voxelPuppetFromJson-param-source"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">source</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../dartive/VoxelPuppet-class.html">VoxelPuppet</a></span>
+  </span>
+  
+    <span class="category voxels cp-3 linked" title="This is part of the Voxels topic."><a href="../topics/Voxels-topic.html">Voxels</a></span>
+
+</dt>
+<dd>
+  Rebuilds a <a href="../dartive/VoxelPuppet-class.html">VoxelPuppet</a> from <a href="../dartive/VoxelPuppetIo/toJson.html">VoxelPuppetIo.toJson</a>'s output (or an
+equivalent hand-written JSON asset).
+  
+
+</dd>
+
+    </dl>
+  </section>
+
+
+
+</div> <!-- /.main-content -->
+<div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+  <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">dartive</a></li>
+    <li class="self-crumb">Voxels topic</li>
+</ol>
+
+  <h5><span class="package-name">dartive</span> <span class="package-kind">package</span></h5>
+  <ol>
+      <li class="section-title">Topics</li>
+        <li><a href="../topics/Linear algebra-topic.html">Linear&nbsp;algebra</a></li>
+        <li><a href="../topics/Projection-topic.html">Projection</a></li>
+        <li><a href="../topics/Grid-topic.html">Grid</a></li>
+        <li><a href="../topics/Voxels-topic.html">Voxels</a></li>
+        <li><a href="../topics/Motion and input-topic.html">Motion&nbsp;and&nbsp;input</a></li>
+      <li class="section-title">Libraries</li>
+      <li><a href="../dartive/">dartive</a></li>
+</ol>
+
+</div>
+<div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  <h5>Voxels topic</h5>
+  <ol>
+
+    <li class="section-title"><a href="../topics/Voxels-topic.html#classes">Classes</a></li>
+      <li><a href="../dartive/VoxelPuppet-class.html">VoxelPuppet</a></li>
+      <li><a href="../dartive/VoxelPuppetPainter-class.html">VoxelPuppetPainter</a></li>
+
+
+
+
+
+
+    <li class="section-title"><a href="../topics/Voxels-topic.html#functions">Functions</a></li>
+      <li><a href="../dartive/voxelPuppetFromJson.html">voxelPuppetFromJson</a></li>
+
+
+
+  <li class="section-title"><a href="../topics/Voxels-topic.html#extensions">Extensions</a></li>
+  <li><a href="../dartive/VoxelPuppetIo.html">VoxelPuppetIo</a></li>
+</ol>
+
+</div>
+<!--/sidebar-offcanvas-right-->
+</main>
+<footer>
+  <span class="no-break">
+    dartive
+      0.0.1
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

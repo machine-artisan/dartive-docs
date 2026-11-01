@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="Projection topic docs, for the Dart programming language.">
+  <title>Projection topic - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">dartive</a></li>
+    <li class="self-crumb">Projection topic</li>
+  </ol>
+  <div class="self-name">Projection</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div id="dartdoc-main-content" class="main-content">
+  <h1><span class="kind-category">Projection</span> topic</h1>
+  
+<section class="desc markdown">
+  <h1 id="projection-prj">Projection (PRJ)</h1>
+<p><code>IsoCamera</code>, <code>isoTileCorners</code>/<code>isoTilePath</code>/<code>isoTileCenter</code>,
+<code>perspectiveTurnX/Y</code>. Notation: <code>linear-algebra.md</code>.</p>
+<h2 id="the-camera-as-a-basis">The camera as a basis</h2>
+<pre class="language-dart"><code>c       = (cos ε cos α, sin ε, cos ε sin α)        where the camera sits
+forward = −c                                       viewing direction
+right   = forward × (0,1,0) = (sin α, 0, −cos α)   always horizontal
+up      = right × forward  = (−sin ε cos α, cos ε, −sin ε sin α)
+</code></pre>
+<h2 id="the-projection-">The projection Π</h2>
+<pre class="language-dart"><code>Π(p) = scale · ( right·p , −up·p )        a 2×3 matrix, rank 2
+ker Π = span(forward)                     depth is thrown away
+</code></pre>
+<h2 id="the-ground-matrix-g-y--0">The ground matrix G (y = 0)</h2>
+<p>The columns are the screen images of <code>e_x</code> and <code>e_z</code>:</p>
+<pre class="language-dart"><code>G = [[ sin α      , −cos α       ],   =  S · R
+     [ sin ε cos α,  sin ε sin α ]]
+
+R = [[sin α, −cos α],[cos α, sin α]]   a rotation (det 1)
+S = diag(1, sin ε)                     a vertical squash by 1/√3
+det G = sin ε = 1/√3                   for EVERY azimuth ⇒ always invertible
+G⁻¹ = Rᵀ · diag(1, √3)
+
+α = 45°:  G ≈ [[0.707, −0.707],[0.408, 0.408]]
+          +x → down-right at 30°, +z → down-left at 30°; on screen the axes meet at ≈109.5°
+</code></pre>
+<p>A point at height h moves up the screen by <code>h · cos ε · scale</code> (<code>right.y = 0</code>, <code>up.y = cos ε</code>).</p>
+<h2 id="invariants">Invariants</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Statement</th>
+<th>Status</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PRJ-1</td>
+<td>(right, up, forward) is orthonormal, <code>right × up = −forward</code>, <code>right.y = 0</code>, <code>up.y = cos ε</code>, for every α</td>
+<td>✅</td>
+<td><code>spec_projection_test</code>, <code>iso_camera_test</code></td>
+</tr>
+<tr>
+<td>PRJ-2</td>
+<td>Π is linear, <code>Π(0) = 0</code>, <code>Π(forward) = 0</code></td>
+<td>✅</td>
+<td><code>spec_projection_test</code></td>
+</tr>
+<tr>
+<td>PRJ-3</td>
+<td><code>G = S·R</code>, <code>det G = 1/√3</code> for every α; G⁻¹ recovers a ground point from its screen image</td>
+<td>✅</td>
+<td>same</td>
+</tr>
+<tr>
+<td>PRJ-4</td>
+<td>Every tile is a parallelogram with area <code>scale²/√3</code>; <code>isoTileCenter</code> is the midpoint of its diagonals</td>
+<td>✅</td>
+<td>same, <code>iso_grid_test</code></td>
+</tr>
+<tr>
+<td>PRJ-5</td>
+<td>Joystick zones rotated by θ classify like G⁻¹ <strong>exactly</strong> iff the screen axes are G-images of the world diagonals x = ±z, i.e. α ∈ {45°, 135°, 225°, 315°} with θ = 90° − α. Elsewhere a pure rotation misclassifies some drags</td>
+<td>✅</td>
+<td>same (exact at 45°, a counterexample at 30°)</td>
+</tr>
+<tr>
+<td>PRJ-6</td>
+<td><code>perspectiveTurnY/X(θ) = P·R(θ)</code>, where P is the identity with entry (3,2) = depth: projective, not affine</td>
+<td>📄</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>Why PRJ-5 holds: the joystick assigns a drag d to whichever world
+component of G⁻¹d is larger. The boundaries are the world diagonals
+x = ±z, and their screen images are <code>G(1,±1)</code>. At α = 45° those images
+are exactly the screen axes. S is diagonal, so it leaves the screen axes
+in place, and the rotation Rᵀ alone puts the zones in the right spots.</p>
+<h2 id="proposed-not-built--rule-1-needs-a-product-consumer-first">Proposed (not built — rule 1: needs a product consumer first)</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Statement</th>
+<th>Unblocks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PRJ-P1</td>
+<td><code>IsoCamera.unprojectGround(Offset s, {scale, planeY = 0}) → (x, z) = G⁻¹(s/scale + (0, planeY·cos ε))</code></td>
+<td>tap → world point</td>
+</tr>
+<tr>
+<td>PRJ-P2</td>
+<td><code>isoCellAt(camera, s, {scale, origin, planeY}) → (⌊x⌋, ⌊z⌋)</code>; invariant <code>isoCellAt(isoTileCenter(x,z)) == (x,z)</code></td>
+<td>tap → grid cell</td>
+</tr>
+<tr>
+<td>PRJ-P3</td>
+<td>One affine view matrix (Π, scale, and canvas origin in a <code>Matrix4</code>) shared by the painter and overlay widgets</td>
+<td>removes duplicated centering math (e.g. <code>MapScreen._cellScreenCenter</code>)</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+
+  <section class="summary offset-anchor" id="classes">
+    <h2>Classes</h2>
+    <dl>
+      <dt id="IsoCamera">
+  <span class="name "><a href="../dartive/IsoCamera-class.html">IsoCamera</a></span> 
+    <span class="category projection cp-1 linked" title="This is part of the Projection topic."><a href="../topics/Projection-topic.html">Projection</a></span>
+
+</dt>
+<dd>
+  A fixed-elevation isometric camera, rotatable around the vertical axis.
+</dd>
+
+    </dl>
+  </section>
+
+
+
+
+
+  <section class="summary offset-anchor" id="functions">
+    <h2>Functions</h2>
+    <dl class="callables">
+      <dt id="isoTileCenter" class="callable">
+  <span class="name"><a href="../dartive/isoTileCenter.html">isoTileCenter</a></span><span class="signature">(<wbr><span class="parameter" id="isoTileCenter-param-camera"><span class="type-annotation"><a href="../dartive/IsoCamera-class.html">IsoCamera</a></span> <span class="parameter-name">camera</span>, </span><span class="parameter" id="isoTileCenter-param-x"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/num-class.html">num</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="isoTileCenter-param-z"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/num-class.html">num</a></span> <span class="parameter-name">z</span>, {</span><span class="parameter" id="isoTileCenter-param-scale"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">scale</span> = <span class="default-value">1.0</span>, </span><span class="parameter" id="isoTileCenter-param-origin"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Offset-class.html">Offset</a></span> <span class="parameter-name">origin</span> = <span class="default-value">Offset.zero</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-ui/Offset-class.html">Offset</a></span>
+  </span>
+  
+    <span class="category projection cp-1 linked" title="This is part of the Projection topic."><a href="../topics/Projection-topic.html">Projection</a></span>
+
+</dt>
+<dd>
+  The screen point for the <em>center</em> of unit cell <code>(x, z)</code> — the usual
+anchor for a marker (avatar, pickup, prop) sitting on that cell,
+rather than one of its corners.
+  
+
+</dd>
+
+      <dt id="isoTileCorners" class="callable">
+  <span class="name"><a href="../dartive/isoTileCorners.html">isoTileCorners</a></span><span class="signature">(<wbr><span class="parameter" id="isoTileCorners-param-camera"><span class="type-annotation"><a href="../dartive/IsoCamera-class.html">IsoCamera</a></span> <span class="parameter-name">camera</span>, </span><span class="parameter" id="isoTileCorners-param-x"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="isoTileCorners-param-z"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">z</span>, {</span><span class="parameter" id="isoTileCorners-param-scale"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">scale</span> = <span class="default-value">1.0</span>, </span><span class="parameter" id="isoTileCorners-param-origin"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Offset-class.html">Offset</a></span> <span class="parameter-name">origin</span> = <span class="default-value">Offset.zero</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-ui/Offset-class.html">Offset</a></span>&gt;</span></span>
+  </span>
+  
+    <span class="category projection cp-1 linked" title="This is part of the Projection topic."><a href="../topics/Projection-topic.html">Projection</a></span>
+
+</dt>
+<dd>
+  The 4 corners of one unit cell <code>(x, z)</code> of a ground-plane grid (<code>y</code>
+fixed at 0), projected through <code>camera</code> — in order
+<code>(x,z) → (x+1,z) → (x+1,z+1) → (x,z+1)</code>, ready to build a quad for an
+isometric floor/wall tile. <code>origin</code> shifts the whole projection (e.g.
+to center a board on a canvas); <code>scale</code> matches
+<a href="../dartive/IsoCamera/projectOrthographic.html">IsoCamera.projectOrthographic</a>'s own <code>scale</code>.
+  
+
+</dd>
+
+      <dt id="isoTilePath" class="callable">
+  <span class="name"><a href="../dartive/isoTilePath.html">isoTilePath</a></span><span class="signature">(<wbr><span class="parameter" id="isoTilePath-param-camera"><span class="type-annotation"><a href="../dartive/IsoCamera-class.html">IsoCamera</a></span> <span class="parameter-name">camera</span>, </span><span class="parameter" id="isoTilePath-param-x"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="isoTilePath-param-z"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">z</span>, {</span><span class="parameter" id="isoTilePath-param-scale"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">scale</span> = <span class="default-value">1.0</span>, </span><span class="parameter" id="isoTilePath-param-origin"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Offset-class.html">Offset</a></span> <span class="parameter-name">origin</span> = <span class="default-value">Offset.zero</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-ui/Path-class.html">Path</a></span>
+  </span>
+  
+    <span class="category projection cp-1 linked" title="This is part of the Projection topic."><a href="../topics/Projection-topic.html">Projection</a></span>
+
+</dt>
+<dd>
+  The same 4 corners as a closed <a href="https://api.flutter.dev/flutter/dart-ui/Path-class.html">Path</a>, ready for <code>canvas.drawPath</code>.
+  
+
+</dd>
+
+      <dt id="perspectiveTurnX" class="callable">
+  <span class="name"><a href="../dartive/perspectiveTurnX.html">perspectiveTurnX</a></span><span class="signature">(<wbr><span class="parameter" id="perspectiveTurnX-param-angleRadians"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">angleRadians</span>, {</span><span class="parameter" id="perspectiveTurnX-param-depth"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">depth</span> = <span class="default-value">0.001</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/vector_math/2.2.0/vector_math_64/Matrix4-class.html">Matrix4</a></span>
+  </span>
+  
+    <span class="category projection cp-1 linked" title="This is part of the Projection topic."><a href="../topics/Projection-topic.html">Projection</a></span>
+
+</dt>
+<dd>
+  The up/down sibling of <a href="../dartive/perspectiveTurnY.html">perspectiveTurnY</a>: <code>rotateX</code> turns around the
+<em>horizontal</em> axis — like a trunk lid hinged front-to-back — so the
+visible motion is a tilt/nod (up/down), not left/right.
+  
+
+</dd>
+
+      <dt id="perspectiveTurnY" class="callable">
+  <span class="name"><a href="../dartive/perspectiveTurnY.html">perspectiveTurnY</a></span><span class="signature">(<wbr><span class="parameter" id="perspectiveTurnY-param-angleRadians"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">angleRadians</span>, {</span><span class="parameter" id="perspectiveTurnY-param-depth"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">depth</span> = <span class="default-value">0.001</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/vector_math/2.2.0/vector_math_64/Matrix4-class.html">Matrix4</a></span>
+  </span>
+  
+    <span class="category projection cp-1 linked" title="This is part of the Projection topic."><a href="../topics/Projection-topic.html">Projection</a></span>
+
+</dt>
+<dd>
+  A perspective "card flip" matrix that fakes a <code>rotateY</code> head/body turn
+for a flat 2D puppet with no real mesh — <code>setEntry(3, 2, depth)</code> adds
+the projective divide a plain <code>rotateY</code> lacks, so the far side visually
+compresses instead of just shearing. Apply around the part's own local
+origin (translate first, then <code>canvas.transform(matrix.storage)</code>).
+  
+
+</dd>
+
+    </dl>
+  </section>
+
+
+
+</div> <!-- /.main-content -->
+<div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+  <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">dartive</a></li>
+    <li class="self-crumb">Projection topic</li>
+</ol>
+
+  <h5><span class="package-name">dartive</span> <span class="package-kind">package</span></h5>
+  <ol>
+      <li class="section-title">Topics</li>
+        <li><a href="../topics/Linear algebra-topic.html">Linear&nbsp;algebra</a></li>
+        <li><a href="../topics/Projection-topic.html">Projection</a></li>
+        <li><a href="../topics/Grid-topic.html">Grid</a></li>
+        <li><a href="../topics/Voxels-topic.html">Voxels</a></li>
+        <li><a href="../topics/Motion and input-topic.html">Motion&nbsp;and&nbsp;input</a></li>
+      <li class="section-title">Libraries</li>
+      <li><a href="../dartive/">dartive</a></li>
+</ol>
+
+</div>
+<div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  <h5>Projection topic</h5>
+  <ol>
+
+    <li class="section-title"><a href="../topics/Projection-topic.html#classes">Classes</a></li>
+      <li><a href="../dartive/IsoCamera-class.html">IsoCamera</a></li>
+
+
+
+
+
+
+    <li class="section-title"><a href="../topics/Projection-topic.html#functions">Functions</a></li>
+      <li><a href="../dartive/isoTileCenter.html">isoTileCenter</a></li>
+      <li><a href="../dartive/isoTileCorners.html">isoTileCorners</a></li>
+      <li><a href="../dartive/isoTilePath.html">isoTilePath</a></li>
+      <li><a href="../dartive/perspectiveTurnX.html">perspectiveTurnX</a></li>
+      <li><a href="../dartive/perspectiveTurnY.html">perspectiveTurnY</a></li>
+
+
+
+</ol>
+
+</div>
+<!--/sidebar-offcanvas-right-->
+</main>
+<footer>
+  <span class="no-break">
+    dartive
+      0.0.1
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

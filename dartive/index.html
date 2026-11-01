@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="dartive library API docs, for the Dart programming language.">
+  <title>dartive library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">dartive</a></li>
+    <li class="self-crumb">dartive.dart</li>
+  </ol>
+  <div class="self-name">dartive</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar=""
+    data-below-sidebar="dartive&#47;dartive-library-sidebar.html">
+  
+    <div>
+      
+
+      <h1>
+        <span class="kind-library">dartive</span>
+        library 
+ 
+
+      </h1>
+    </div>
+
+    
+<section class="desc markdown">
+  <p>dartive (dart + rive): a from-scratch Dart scene-graph/game-action/state
+library, grown out of <code>products/squishy-mascot-twin</code>'s hand-rolled
+puppet rendering. Pre-1.0 "seed" stage — see this package's own
+<code>.context/decisions/0001-dartive-seed-genesis.md</code> for what that means.</p>
+</section>
+
+
+    <section class="summary offset-anchor" id="classes">
+      <h2>Classes</h2>
+      <dl>
+          <dt id="IsoCamera">
+  <span class="name "><a href="../dartive/IsoCamera-class.html">IsoCamera</a></span> 
+    <span class="category projection cp-1 linked" title="This is part of the Projection topic."><a href="../topics/Projection-topic.html">Projection</a></span>
+
+</dt>
+<dd>
+  A fixed-elevation isometric camera, rotatable around the vertical axis.
+</dd>
+
+          <dt id="MazeGenerator">
+  <span class="name "><a href="../dartive/MazeGenerator-class.html">MazeGenerator</a></span> 
+    <span class="category grid cp-2 linked" title="This is part of the Grid topic."><a href="../topics/Grid-topic.html">Grid</a></span>
+
+</dt>
+<dd>
+  A static, generated rectangular maze — <strong>one particular kind of
+<a href="../dartive/Tilemap-class.html">Tilemap</a>: a walled one.</strong> Extracted into dartive after the same
+recursive-backtracker algorithm had been hand-copied and re-adapted
+across three products in a row — <code>my-rownie-run-item</code>'s original,
+ported into <code>my-atlas-run-item</code>'s <code>MazeBoard</code>, then into
+<code>my-astronaut-run-item</code>'s own <code>MazeGenerator</code> (square <code>size</code> only) —
+before <code>raon-runner-platform-mockup/apps/maze-run-demo</code>'s village
+board needed a <strong>rectangular</strong> (20×10) board and made the duplication
+worth stopping. <strong>Extends <a href="../dartive/Tilemap-class.html">Tilemap</a></strong> (not a separate concept from
+it) since the user asked for the "open board" case — a village with
+no walls — not to be confused with "a maze," the same distinction
+<code>my-atlas-run-item</code>'s <code>RunBoard.isMaze</code> flag already drew between
+<code>MazeBoard</code> and <code>AtlasRunBoard</code>. See
+<code>.context/decisions/0012-maze-and-joystick-extraction.md</code> and
+<code>0014-tilemap-extraction.md</code>.
+Standard "recursive backtracker" over the chambers at even
+coordinates; every odd-coordinate cell starts as a wall, and a wall
+slot between two chambers is removed exactly when the carve reaches
+between them. A <strong>fixed seed</strong>, so this is one learnable maze,
+identical every load — not regenerated per session. Pure Dart, no
+Flutter dependency, so it's directly unit-testable
+(<code>agent-harness-patterns.md</code>'s "keep state and rendering separate,"
+applied one layer further down than usual).
+</dd>
+
+          <dt id="RearmableTimer">
+  <span class="name "><a href="../dartive/RearmableTimer-class.html">RearmableTimer</a></span> 
+    <span class="category motion-and-input cp-4 linked" title="This is part of the Motion and input topic."><a href="../topics/Motion and input-topic.html">Motion&nbsp;and&nbsp;input</a></span>
+
+</dt>
+<dd>
+  A <code>Timer</code> that can be re-armed (cancel the pending firing and schedule a
+new one) without the caller hand-tracking a nullable <code>Timer?</code> field and
+repeating the <code>_timer?.cancel(); _timer = Timer(...)</code> dance. Pure
+<code>dart:async</code> — no Riverpod, no scheduling policy of its own; the
+caller still decides durations and callbacks, <code>arm</code>/<code>cancel</code> are just
+the lifecycle plumbing.
+</dd>
+
+          <dt id="Tilemap">
+  <span class="name "><a href="../dartive/Tilemap-class.html">Tilemap</a></span> 
+    <span class="category grid cp-2 linked" title="This is part of the Grid topic."><a href="../topics/Grid-topic.html">Grid</a></span>
+
+</dt>
+<dd>
+  A rectangular (<code>width</code>×<code>height</code>) grid of cells a character can stand
+on and move across, with a per-cell walkable/blocked check — the
+convergent shape every <code>*Board</code> class in this factory already
+reinvents on its own: <code>RunBoard</code>/<code>MazeBoard</code>/<code>AtlasRunBoard</code>
+(<code>my-atlas-run-item</code>, <code>isMaze</code> flag distinguishing a walled board
+from an open one), <code>PartnerBoard</code> (<code>my-astronaut-run-item</code>, always
+open), <code>ExplorerBoard</code> (<code>voxel-explorer-spike</code>, open + zone-tinted).
+None of those were built <em>from</em> this — this is the first time the
+shape itself is shared.
+</dd>
+
+          <dt id="TouchJoystickCanvas">
+  <span class="name "><a href="../dartive/TouchJoystickCanvas-class.html">TouchJoystickCanvas</a></span> 
+    <span class="category motion-and-input cp-4 linked" title="This is part of the Motion and input topic."><a href="../topics/Motion and input-topic.html">Motion&nbsp;and&nbsp;input</a></span>
+
+</dt>
+<dd>
+  Wraps <a href="../dartive/TouchJoystickCanvas/child.html">child</a> (the map canvas) with a touch-to-summon virtual
+joystick: touching the canvas and dragging past a small reveal
+threshold shows a base+knob anchored at the touch-down point,
+reporting one of the 4 <a href="../dartive/JoystickDirection.html">JoystickDirection</a>s. A touch that never
+exceeds the reveal threshold (an ordinary tap) never shows anything.
+</dd>
+
+          <dt id="Vec3">
+  <span class="name "><a href="../dartive/Vec3-class.html">Vec3</a></span> 
+    <span class="category linear-algebra cp-0 linked" title="This is part of the Linear algebra topic."><a href="../topics/Linear algebra-topic.html">Linear&nbsp;algebra</a></span>
+
+</dt>
+<dd>
+  An immutable vector <strong>v</strong> = (x, y, z) ∈ ℝ³ in world space, with the
+factory's right-handed axes: <code>+x</code> right, <code>+y</code> up, <code>+z</code> forward.
+</dd>
+
+          <dt id="VoxelPuppet">
+  <span class="name "><a href="../dartive/VoxelPuppet-class.html">VoxelPuppet</a></span> 
+    <span class="category voxels cp-3 linked" title="This is part of the Voxels topic."><a href="../topics/Voxels-topic.html">Voxels</a></span>
+
+</dt>
+<dd>
+  A sparse grid of colored unit cubes — a puppet built out of voxels
+instead of bones/parts. State only: knows nothing about how it gets
+drawn (see <a href="../dartive/VoxelPuppetPainter-class.html">VoxelPuppetPainter</a> in <code>voxel_puppet_painter.dart</code>) — same
+state/render split as every other product in this factory. Coordinates
+are grid-cell indices (0..size-1 per axis), not world units.
+</dd>
+
+          <dt id="VoxelPuppetPainter">
+  <span class="name "><a href="../dartive/VoxelPuppetPainter-class.html">VoxelPuppetPainter</a></span> 
+    <span class="category voxels cp-3 linked" title="This is part of the Voxels topic."><a href="../topics/Voxels-topic.html">Voxels</a></span>
+
+</dt>
+<dd>
+  Renders a <a href="../dartive/VoxelPuppet-class.html">VoxelPuppet</a> as flat-shaded, depth-sorted unit cubes under a
+given <a href="../dartive/VoxelPuppetPainter/camera.html">camera</a> — backface-culled, and faces fully hidden by a
+neighboring voxel are skipped before that, so this stays cheap even at
+a puppet's full grid size. <code>camera</code> is a constructor parameter, not a
+fixed field, so the same puppet can be painted from several angles at
+once (see <code>products/voxel-asset-bakery</code>'s multi-view panel for a
+consumer that does exactly that).
+</dd>
+
+      </dl>
+    </section>
+
+    <section class="summary offset-anchor" id="enums">
+      <h2>Enums</h2>
+      <dl>
+          <dt id="JoystickDirection">
+  <span class="name "><a href="../dartive/JoystickDirection.html">JoystickDirection</a></span> 
+    <span class="category motion-and-input cp-4 linked" title="This is part of the Motion and input topic."><a href="../topics/Motion and input-topic.html">Motion&nbsp;and&nbsp;input</a></span>
+
+</dt>
+<dd>
+  <strong>Extracted into dartive</strong> from
+<code>products/my-astronaut-run-item/lib/screens/touch_joystick.dart</code> —
+that product's own <code>.context/decisions/0021-restore-joystick-axis-labels.md</code>/
+<code>0020</code>/<code>0018</code>/<code>0010</code> carry the full history of why it works this way
+(reasoning that stays valid here unchanged). Every <code>my-*-run-item</code>
+product to date has needed its own grid-walk joystick; this is the
+first time it's shared rather than re-copied. See
+<code>.context/decisions/0012-maze-and-joystick-extraction.md</code>.
+One of the 4 grid directions a touch drag can report — never
+diagonal.
+</dd>
+
+      </dl>
+    </section>
+
+
+
+    <section class="summary offset-anchor" id="extensions">
+      <h2>Extensions</h2>
+      <dl>
+          <dt id="VoxelPuppetIo">
+  <span class="name "><a href="../dartive/VoxelPuppetIo.html">VoxelPuppetIo</a></span>
+  on <a href="../dartive/VoxelPuppet-class.html">VoxelPuppet</a>
+  
+    <span class="category voxels cp-3 linked" title="This is part of the Voxels topic."><a href="../topics/Voxels-topic.html">Voxels</a></span>
+
+</dt>
+<dd>
+  Serialization for <a href="../dartive/VoxelPuppet-class.html">VoxelPuppet</a> — plain JSON (grid size + a flat list
+of <code>{x,y,z,color}</code> cells), not a Dart-source literal or a binary
+format: any consuming product can parse this with nothing but
+<code>dart:convert</code>, no extra dependency beyond <code>dartive</code> itself.
+</dd>
+
+      </dl>
+    </section>
+
+
+
+    <section class="summary offset-anchor" id="functions">
+      <h2>Functions</h2>
+      <dl class="callables">
+          <dt id="dipAndRecoverPulse" class="callable">
+  <span class="name"><a href="../dartive/dipAndRecoverPulse.html">dipAndRecoverPulse</a></span><span class="signature">(<wbr><span class="parameter" id="dipAndRecoverPulse-param-elapsed"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a></span> <span class="parameter-name">elapsed</span>, {</span><span class="parameter" id="dipAndRecoverPulse-param-rising"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a></span> <span class="parameter-name">rising</span>, </span><span class="parameter" id="dipAndRecoverPulse-param-falling"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a></span> <span class="parameter-name">falling</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span>
+  </span>
+  
+    <span class="category motion-and-input cp-4 linked" title="This is part of the Motion and input topic."><a href="../topics/Motion and input-topic.html">Motion&nbsp;and&nbsp;input</a></span>
+
+</dt>
+<dd>
+  1.0 outside the pulse window, dipping to 0.0 and back as <code>elapsed</code> runs
+from zero to <code>rising + falling</code> — a brief "close, then reopen" shape.
+Ordering matches Rive's own "Interpolation on States": a value eased
+<em>into</em> a state, then eased back out, driven by however the caller
+decides <em>when</em> the pulse starts (a timer, a trigger — dartive stays
+pure math, no scheduling; see this package's own CLAUDE.md).
+  
+
+</dd>
+
+          <dt id="gridBfsPath" class="callable">
+  <span class="name"><a href="../dartive/gridBfsPath.html">gridBfsPath</a></span><span class="signature">(<wbr>{<span class="parameter" id="gridBfsPath-param-start"><span>required</span> <span class="type-annotation">(<span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span></span>)</span> <span class="parameter-name">start</span>, </span><span class="parameter" id="gridBfsPath-param-goal"><span>required</span> <span class="type-annotation">(<span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span></span>)</span> <span class="parameter-name">goal</span>, </span><span class="parameter" id="gridBfsPath-param-isBlocked"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isBlocked</span>(<span class="parameter" id="param-x"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="param-z"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">z</span></span>), </span><span class="parameter" id="gridBfsPath-param-width"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span>, </span><span class="parameter" id="gridBfsPath-param-height"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">height</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter">(<span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>, </span><span class="field"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span></span>)</span>&gt;</span>?</span>
+  </span>
+  
+    <span class="category grid cp-2 linked" title="This is part of the Grid topic."><a href="../topics/Grid-topic.html">Grid</a></span>
+
+</dt>
+<dd>
+  Breadth-first shortest path over a 4-connected integer grid — the
+standard unweighted-graph shortest-path algorithm, scoped
+specifically to "a small rectangular grid, 4-directional movement,
+every edge the same length," which is what a mini-game board
+typically is. Not a general graph library.
+  
+
+</dd>
+
+          <dt id="isoTileCenter" class="callable">
+  <span class="name"><a href="../dartive/isoTileCenter.html">isoTileCenter</a></span><span class="signature">(<wbr><span class="parameter" id="isoTileCenter-param-camera"><span class="type-annotation"><a href="../dartive/IsoCamera-class.html">IsoCamera</a></span> <span class="parameter-name">camera</span>, </span><span class="parameter" id="isoTileCenter-param-x"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/num-class.html">num</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="isoTileCenter-param-z"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/num-class.html">num</a></span> <span class="parameter-name">z</span>, {</span><span class="parameter" id="isoTileCenter-param-scale"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">scale</span> = <span class="default-value">1.0</span>, </span><span class="parameter" id="isoTileCenter-param-origin"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Offset-class.html">Offset</a></span> <span class="parameter-name">origin</span> = <span class="default-value">Offset.zero</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-ui/Offset-class.html">Offset</a></span>
+  </span>
+  
+    <span class="category projection cp-1 linked" title="This is part of the Projection topic."><a href="../topics/Projection-topic.html">Projection</a></span>
+
+</dt>
+<dd>
+  The screen point for the <em>center</em> of unit cell <code>(x, z)</code> — the usual
+anchor for a marker (avatar, pickup, prop) sitting on that cell,
+rather than one of its corners.
+  
+
+</dd>
+
+          <dt id="isoTileCorners" class="callable">
+  <span class="name"><a href="../dartive/isoTileCorners.html">isoTileCorners</a></span><span class="signature">(<wbr><span class="parameter" id="isoTileCorners-param-camera"><span class="type-annotation"><a href="../dartive/IsoCamera-class.html">IsoCamera</a></span> <span class="parameter-name">camera</span>, </span><span class="parameter" id="isoTileCorners-param-x"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="isoTileCorners-param-z"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">z</span>, {</span><span class="parameter" id="isoTileCorners-param-scale"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">scale</span> = <span class="default-value">1.0</span>, </span><span class="parameter" id="isoTileCorners-param-origin"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Offset-class.html">Offset</a></span> <span class="parameter-name">origin</span> = <span class="default-value">Offset.zero</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-ui/Offset-class.html">Offset</a></span>&gt;</span></span>
+  </span>
+  
+    <span class="category projection cp-1 linked" title="This is part of the Projection topic."><a href="../topics/Projection-topic.html">Projection</a></span>
+
+</dt>
+<dd>
+  The 4 corners of one unit cell <code>(x, z)</code> of a ground-plane grid (<code>y</code>
+fixed at 0), projected through <code>camera</code> — in order
+<code>(x,z) → (x+1,z) → (x+1,z+1) → (x,z+1)</code>, ready to build a quad for an
+isometric floor/wall tile. <code>origin</code> shifts the whole projection (e.g.
+to center a board on a canvas); <code>scale</code> matches
+<a href="../dartive/IsoCamera/projectOrthographic.html">IsoCamera.projectOrthographic</a>'s own <code>scale</code>.
+  
+
+</dd>
+
+          <dt id="isoTilePath" class="callable">
+  <span class="name"><a href="../dartive/isoTilePath.html">isoTilePath</a></span><span class="signature">(<wbr><span class="parameter" id="isoTilePath-param-camera"><span class="type-annotation"><a href="../dartive/IsoCamera-class.html">IsoCamera</a></span> <span class="parameter-name">camera</span>, </span><span class="parameter" id="isoTilePath-param-x"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="isoTilePath-param-z"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">z</span>, {</span><span class="parameter" id="isoTilePath-param-scale"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">scale</span> = <span class="default-value">1.0</span>, </span><span class="parameter" id="isoTilePath-param-origin"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-ui/Offset-class.html">Offset</a></span> <span class="parameter-name">origin</span> = <span class="default-value">Offset.zero</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-ui/Path-class.html">Path</a></span>
+  </span>
+  
+    <span class="category projection cp-1 linked" title="This is part of the Projection topic."><a href="../topics/Projection-topic.html">Projection</a></span>
+
+</dt>
+<dd>
+  The same 4 corners as a closed <a href="https://api.flutter.dev/flutter/dart-ui/Path-class.html">Path</a>, ready for <code>canvas.drawPath</code>.
+  
+
+</dd>
+
+          <dt id="perspectiveTurnX" class="callable">
+  <span class="name"><a href="../dartive/perspectiveTurnX.html">perspectiveTurnX</a></span><span class="signature">(<wbr><span class="parameter" id="perspectiveTurnX-param-angleRadians"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">angleRadians</span>, {</span><span class="parameter" id="perspectiveTurnX-param-depth"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">depth</span> = <span class="default-value">0.001</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/vector_math/2.2.0/vector_math_64/Matrix4-class.html">Matrix4</a></span>
+  </span>
+  
+    <span class="category projection cp-1 linked" title="This is part of the Projection topic."><a href="../topics/Projection-topic.html">Projection</a></span>
+
+</dt>
+<dd>
+  The up/down sibling of <a href="../dartive/perspectiveTurnY.html">perspectiveTurnY</a>: <code>rotateX</code> turns around the
+<em>horizontal</em> axis — like a trunk lid hinged front-to-back — so the
+visible motion is a tilt/nod (up/down), not left/right.
+  
+
+</dd>
+
+          <dt id="perspectiveTurnY" class="callable">
+  <span class="name"><a href="../dartive/perspectiveTurnY.html">perspectiveTurnY</a></span><span class="signature">(<wbr><span class="parameter" id="perspectiveTurnY-param-angleRadians"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">angleRadians</span>, {</span><span class="parameter" id="perspectiveTurnY-param-depth"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/double-class.html">double</a></span> <span class="parameter-name">depth</span> = <span class="default-value">0.001</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/vector_math/2.2.0/vector_math_64/Matrix4-class.html">Matrix4</a></span>
+  </span>
+  
+    <span class="category projection cp-1 linked" title="This is part of the Projection topic."><a href="../topics/Projection-topic.html">Projection</a></span>
+
+</dt>
+<dd>
+  A perspective "card flip" matrix that fakes a <code>rotateY</code> head/body turn
+for a flat 2D puppet with no real mesh — <code>setEntry(3, 2, depth)</code> adds
+the projective divide a plain <code>rotateY</code> lacks, so the far side visually
+compresses instead of just shearing. Apply around the part's own local
+origin (translate first, then <code>canvas.transform(matrix.storage)</code>).
+  
+
+</dd>
+
+          <dt id="voxelPuppetFromJson" class="callable">
+  <span class="name"><a href="../dartive/voxelPuppetFromJson.html">voxelPuppetFromJson</a></span><span class="signature">(<wbr><span class="parameter" id="voxelPuppetFromJson-param-source"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">source</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../dartive/VoxelPuppet-class.html">VoxelPuppet</a></span>
+  </span>
+  
+    <span class="category voxels cp-3 linked" title="This is part of the Voxels topic."><a href="../topics/Voxels-topic.html">Voxels</a></span>
+
+</dt>
+<dd>
+  Rebuilds a <a href="../dartive/VoxelPuppet-class.html">VoxelPuppet</a> from <a href="../dartive/VoxelPuppetIo/toJson.html">VoxelPuppetIo.toJson</a>'s output (or an
+equivalent hand-written JSON asset).
+  
+
+</dd>
+
+      </dl>
+    </section>
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">dartive</a></li>
+    <li class="self-crumb">dartive.dart</li>
+</ol>
+
+    <h5><span class="package-name">dartive</span> <span class="package-kind">package</span></h5>
+    <ol>
+      <li class="section-title">Topics</li>
+        <li><a href="../topics/Linear algebra-topic.html">Linear&nbsp;algebra</a></li>
+        <li><a href="../topics/Projection-topic.html">Projection</a></li>
+        <li><a href="../topics/Grid-topic.html">Grid</a></li>
+        <li><a href="../topics/Voxels-topic.html">Voxels</a></li>
+        <li><a href="../topics/Motion and input-topic.html">Motion&nbsp;and&nbsp;input</a></li>
+      <li class="section-title">Libraries</li>
+      <li><a href="../dartive/">dartive</a></li>
+</ol>
+
+  </div>
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+    <h5>dartive library</h5>
+  </div><!--/sidebar-offcanvas-right-->
+</main>
+<footer>
+  <span class="no-break">
+    dartive
+      0.0.1
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+
